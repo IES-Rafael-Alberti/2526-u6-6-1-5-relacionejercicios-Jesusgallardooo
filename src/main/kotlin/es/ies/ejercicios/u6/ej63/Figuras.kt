@@ -3,7 +3,7 @@ package es.ies.ejercicios.u6.ej63
 /**
  * Plantilla para el ejercicio 6.3.
  *
- * Completa los TODOs para practicar:
+ * Completa los TODO para practicar:
  * - Constructores primarios y secundarios.
  * - Delegación `this(...)` en secundarios.
  * - Llamada a `super(...)` en herencia.
@@ -42,7 +42,15 @@ class Rectangulo(
         println("[Rectangulo:secondary] constructor(ancho, alto)")
     }
 
-    // TODO: añade otro constructor secundario que cree un cuadrado (lado -> ancho=alto)
+    constructor(lado: Int): this(
+        color = "sin-color",
+        etiqueta = "cuadrado",
+        ancho = lado,
+        alto = lado
+    ){
+        println("[Rectangulo:secondary] constructor(lado) [cuadrado] ")
+    }
+
 }
 
 class Circulo(
@@ -54,7 +62,29 @@ class Circulo(
         println("[Circulo:init] radio=$radio")
     }
 
-    // TODO: añade al menos un constructor secundario que delegue con this(...)
+    constructor(radio: Int): this(
+        color = "sin-color",
+        etiqueta = "circulo",
+        radio = radio
+    ){
+        println("[Circulo:secondary] constructor(radio)")
+    }
+
+}
+
+class Triangulo : Figura {
+    val base: Int
+    val altura: Int
+
+    constructor(base: Int, altura: Int) : super("sin-color", "triangulo") {
+        println("[Triangulo:secondary] constructor(base, altura) -> constructor padre")
+        this.base = base
+        this.altura = altura
+    }
+
+    constructor(lado: Int) : this(base = lado, altura = lado) {
+        println("[Triangulo:secondary] constructor(lado) -> this(base, altura)")
+    }
 }
 
 /*
