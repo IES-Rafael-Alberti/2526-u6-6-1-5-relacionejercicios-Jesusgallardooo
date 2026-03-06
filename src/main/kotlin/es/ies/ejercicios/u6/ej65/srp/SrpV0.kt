@@ -13,33 +13,65 @@ import es.ies.ejercicios.u6.ej64.Resumible
  * - genera informe
  * - hace logs
  */
-class InformeAppServiceV0 {
-    fun ejecutar() {
-        println("[SRP:v0] Preparando datos...")
-        val items: List<Resumible> = listOf(
+
+// única responsabilidad: crear o preparar los datos.
+class PreparadorDatos {
+    fun obtenerItems(): List<Resumible> {
+        return listOf(
             Persona(" Ana ", 20),
             Alumno("Luis", 19, "1DAM"),
             Persona("Marta", 18),
         )
+    }
+}
 
-        println("[SRP:v0] Registrando personas...")
-        val registro = RegistroPersonas()
+// única responsabilidad: gestionar el registro de personas
+class ServicioRegistro {
+    private val registro = RegistroPersonas()
+
+    fun registrarPersonas(items: List<Resumible>) {
         for (item in items) {
             if (item is Persona) registro.registrar(item)
         }
+    }
 
-        println("[SRP:v0] Generando informe Markdown...")
+    fun buscar(nombre: String): Persona? {
+        return registro.buscar(nombre)
+    }
+}
+
+// única responsabilidad: crear el informe
+class GeneradorInforme {
+    fun generar(items: List<Resumible>): String {
         val informe = InformeMarkdown()
-        val salida = informe.generar("Listado", items)
+        return informe.generar("Listado", items)
+    }
+}
 
-        println("[SRP:v0] Resultado:")
+// única responsabilidad: coordinar los servicios, no abarca todas las funcionaliades.
+class InformeAppService {
+    fun ejecutar() {
+
+        println("[SRP] Preparando datos...")
+        val preparador = PreparadorDatos()
+        val items = preparador.obtenerItems()
+
+        println("[SRP] Registrando personas...")
+        val servicioRegistro = ServicioRegistro()
+        servicioRegistro.registrarPersonas(items)
+
+        println("[SRP] Generando informe Markdown...")
+        val generador = GeneradorInforme()
+        val salida = generador.generar(items)
+
+        println("[SRP] Resultado:")
         println(salida)
 
-        println("[SRP:v0] Buscar 'ana' -> ${registro.buscar("ana")?.resumen()}")
+        println("[SRP] Buscar 'ana' -> ${servicioRegistro.buscar("ana")?.resumen()}")
     }
 }
 
 fun main() {
-    InformeAppServiceV0().ejecutar()
+    InformeAppService().ejecutar()
 }
 
