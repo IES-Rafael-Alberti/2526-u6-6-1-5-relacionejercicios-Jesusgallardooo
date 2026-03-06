@@ -5,14 +5,29 @@ import es.ies.ejercicios.u6.ej64.Persona
 /**
  * v0 (viola ISP): interfaz "gorda" que fuerza a implementar métodos que algunos clientes no necesitan.
  */
-interface RepositorioPersonasCompletoV0 {
-    fun guardar(persona: Persona)
+
+interface RepositorioLecturaPersonas {
     fun buscar(nombre: String): Persona?
+}
+
+interface RepositorioEscrituraPersonas {
+    fun guardar(persona: Persona)
+}
+
+interface RepositorioExportacionPersonas {
     fun exportarCsv(): String
+}
+
+interface RepositorioBorradoPersonas {
     fun borrarTodo()
 }
 
-class RepositorioMemoriaV0 : RepositorioPersonasCompletoV0 {
+class RepositorioMemoria :
+    RepositorioLecturaPersonas,
+    RepositorioEscrituraPersonas,
+    RepositorioExportacionPersonas,
+    RepositorioBorradoPersonas {
+
     private val map = mutableMapOf<String, Persona>()
 
     override fun guardar(persona: Persona) {
@@ -24,7 +39,9 @@ class RepositorioMemoriaV0 : RepositorioPersonasCompletoV0 {
     override fun exportarCsv(): String =
         buildString {
             appendLine("nombre,edad")
-            for (p in map.values) appendLine("${p.nombre},${p.edad}")
+            for (p in map.values) {
+                appendLine("${p.nombre},${p.edad}")
+            }
         }
 
     override fun borrarTodo() {
@@ -32,18 +49,17 @@ class RepositorioMemoriaV0 : RepositorioPersonasCompletoV0 {
     }
 }
 
-/**
- * Cliente que solo necesita buscar, pero depende de una interfaz con demasiadas cosas.
- */
-class BuscadorPersonasV0(private val repo: RepositorioPersonasCompletoV0) {
+
+class BuscadorPersonas(private val repo: RepositorioLecturaPersonas) {
     fun buscar(nombre: String): Persona? = repo.buscar(nombre)
 }
 
 fun main() {
-    val repo = RepositorioMemoriaV0()
+    val repo = RepositorioMemoria()
     repo.guardar(Persona("Ana", 20))
 
-    val buscador = BuscadorPersonasV0(repo)
+    val buscador = BuscadorPersonas(repo)
+
     println("Buscar Ana -> ${buscador.buscar("Ana")?.resumen()}")
 }
 
